@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_cors import CORS
 import requests
 import json
 from datetime import datetime
