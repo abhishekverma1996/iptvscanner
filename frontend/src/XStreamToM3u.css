@@ -1,0 +1,94 @@
+/* XStreamToM3u.css */
+
+/* Basic styling for the generator container */
+.generator {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+
+/* Heading styling */
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Label styling */
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+/* Input fields styling */
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    /* Ensure padding doesn't break layout */
+}
+
+/* Button styling */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Disabled button */
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Error message */
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* Download button */
+button.download {
+    background-color: #28a745;
+    margin-top: 20px;
+}
+
+button.download:hover {
+    background-color: #218838;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .generator {
+        padding: 15px;
+        width: 90%;
+    }
+
+    input,
+    button {
+        padding: 8px;
+        font-size: 14px;
+    }
+}

@@ -1,0 +1,147 @@
+/* XStreamGenerator.css */
+
+/* Basic styling for the generator container */
+.generator {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+/* Label styling */
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Input fields styling */
+input,
+button {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 15px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Button styling */
+button {
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Disable button when loading */
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Scan progress container */
+.scan-progress-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 15px;
+  padding-right: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Styling for success/fail counts */
+.status-counts {
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Progress list container */
+.progress-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+/* List items for scan progress */
+.scan-progress-container ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.scan-progress-container li {
+  padding: 8px;
+  margin-bottom: 5px;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* Color coding for different statuses */
+.success {
+  color: green;
+}
+
+.failed {
+  color: red;
+}
+
+.scanning {
+  color: orange;
+}
+
+/* Responsive adjustments for categories checkbox */
+@media (max-width: 768px) {
+  .generator {
+    padding: 15px;
+    /* Reduce padding for smaller screens */
+    max-width: 100%;
+  }
+
+  .status-counts {
+    font-size: 14px;
+    /* Smaller font size on smaller screens */
+  }
+
+  /* Adjust the layout for the category checkbox */
+  label input[type="checkbox"] {
+    margin-left: 0;
+    font-size: 14px;
+    /* Slightly smaller font for mobile devices */
+  }
+}
+
+@media (max-width: 480px) {
+  .scan-progress-container {
+    padding: 10px;
+    /* Padding adjustment */
+  }
+
+  .status-counts {
+    font-size: 12px;
+    /* Further reduce font size */
+  }
+
+  /* Reduce font size for the category checkbox on very small screens */
+  label input[type="checkbox"] {
+    font-size: 12px;
+  }
+}
