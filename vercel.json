@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/react"  // Frontend ke liye React use kar rahe hain
+    },
+    {
+      "src": "backend/api/**/*.py",
+      "use": "@vercel/python"  // Backend ke liye Python use kar rahe hain
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/api/$1"  // Backend ke liye route set kar rahe hain
+    }
+  ]
+}
