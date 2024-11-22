@@ -12,7 +12,7 @@ from typing import Dict, Any, List, Optional, Tuple
 
 app = Flask(__name__)
 CORS(app)
-
+CORS(app, origins="https://iptvscanner-frontend.vercel.app")
 # Register macscanner blueprint
 app.register_blueprint(macscanner, url_prefix='/macscanner')  # This will add the '/macscanner' prefix for the routes in macscanner
 
