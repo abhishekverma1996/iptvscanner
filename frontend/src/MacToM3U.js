@@ -53,7 +53,8 @@ function App() {
 
   return (
     <div className="App">
-      <h1>IPTV Channel Fetcher</h1>
+      <h1>MAC TO M3U</h1>
+      <h2>Not all MAC support playlist functionality.Please play M3u file after downloading.</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Base URL:</label>
