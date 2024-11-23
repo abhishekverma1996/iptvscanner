@@ -84,7 +84,7 @@ const MacScanner = () => {
         const macAddress = macList[i];
         const payload = { base_url: baseUrl, mac_address: macAddress };
 
-        const response = await fetch("https://iptvscanner.onrender.com/macscanner/scan_mac", {
+        const response = await fetch("http://localhost:5000/macscanner/scan_mac", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -148,8 +148,8 @@ const MacScanner = () => {
 
   return (
     <div>
-      <h1>IPTV MAC Address Scanner</h1>
-
+      <h1>IPTV MAC Scanner</h1>
+      <h2>Only Supports Normal Portals</h2>
       {/* Show panel URL input only once */}
       {!baseUrl && (
         <form onSubmit={handleSubmit}>
