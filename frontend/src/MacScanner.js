@@ -13,7 +13,7 @@ const MacScanner = () => {
   const abortControllerRef = useRef(null);
 
   const handleBaseUrlChange = (e) => {
-    setBaseUrl(e.target.value); // Allow full typing without interruption
+    setBaseUrl(e.target.value); // Allow full typing and pasting
   };
 
   const handleFileChange = (e) => {
@@ -156,9 +156,12 @@ const MacScanner = () => {
               placeholder="Enter IPTV panel address (http:// or https://)"
               required
               autoComplete="off"
-              onFocus={(e) => e.target.setSelectionRange(e.target.value.length, e.target.value.length)} // Ensure caret stays at the end
+              onFocus={(e) => e.target.setSelectionRange(e.target.value.length, e.target.value.length)}
             />
           </label>
+          <p style={{ fontSize: "0.8em", color: "gray" }}>
+            You can paste the address here. Long-press or right-click to paste.
+          </p>
         </div>
         <div>
           <label>
@@ -176,14 +179,18 @@ const MacScanner = () => {
         </button>
       </form>
 
+      <div>
+        <h2>Scan Statistics:</h2>
+        <div>
+          <strong>Success:</strong> {successCount} | <strong>Failure:</strong> {failureCount}
+        </div>
+      </div>
+
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {results.length > 0 && (
         <div>
           <h2>Scan Results:</h2>
-          <div>
-            <strong>Success:</strong> {successCount} | <strong>Failure:</strong> {failureCount}
-          </div>
           <div
             style={{
               maxHeight: "400px",
