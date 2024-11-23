@@ -41,16 +41,6 @@ const MacGenerator = () => {
     setIsLoading(false);
   };
 
-  // Function to download MAC addresses as a text file
-  const downloadMacFile = () => {
-    const fileContent = macs.join('\n'); // Join MACs with newline for each MAC on a new line
-    const blob = new Blob([fileContent], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'combo_mac.txt'; // File name
-    link.click(); // Trigger the download
-  };
-
   return (
     <div className="container">
       <h2>MAC Generator</h2>
@@ -78,11 +68,6 @@ const MacGenerator = () => {
           ))}
         </div>
       </div>
-
-      {/* Download Button */}
-      {macs.length > 0 && (
-        <button onClick={downloadMacFile}>Download MAC</button>
-      )}
     </div>
   );
 };
