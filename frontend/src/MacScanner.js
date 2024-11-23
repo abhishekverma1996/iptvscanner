@@ -159,9 +159,6 @@ const MacScanner = () => {
               onFocus={(e) => e.target.setSelectionRange(e.target.value.length, e.target.value.length)}
             />
           </label>
-          <p style={{ fontSize: "0.8em", color: "gray" }}>
-            You can paste the address here. Long-press or right-click to paste.
-          </p>
         </div>
         <div>
           <label>
