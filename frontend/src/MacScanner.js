@@ -84,7 +84,7 @@ const MacScanner = () => {
         const macAddress = macList[i];
         const payload = { base_url: baseUrl, mac_address: macAddress };
 
-        const response = await fetch("http://localhost:5000/macscanner/scan_mac", {
+        const response = await fetch("https://iptvscanner.onrender.com/macscanner/scan_mac", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
