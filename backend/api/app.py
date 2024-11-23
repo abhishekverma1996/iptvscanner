@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
-from macscanner import macscanner  # Import macscanner blueprint
+from api.macscanner import macscanner  # Import macscanner blueprint
 import requests
 import json
 from datetime import datetime
