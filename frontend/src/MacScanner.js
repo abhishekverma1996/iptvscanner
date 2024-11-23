@@ -13,7 +13,12 @@ const MacScanner = () => {
   const abortControllerRef = useRef(null);
 
   const handleBaseUrlChange = (e) => setBaseUrl(e.target.value.trim());
-  const handleFileChange = (e) => setFile(e.target.files[0]);
+  const handleFileChange = (e) => {
+    const uploadedFile = e.target.files[0];
+    if (uploadedFile) {
+      setFile(uploadedFile);
+    }
+  };
 
   const handleStop = () => {
     if (abortControllerRef.current) {
@@ -24,15 +29,14 @@ const MacScanner = () => {
   };
 
   const handleDownload = () => {
-    // Convert results into a plain text string
     const textContent = results
       .map((result) => {
         return `Panel URL: ${baseUrl}\nMAC: ${result.mac}\nStatus: ${result.status}\nMessage: ${result.message || ""}\n${
           result.expiry ? `Expiry: ${result.expiry}\n` : ""
-        }${result.channel_count ? `Channel Count: ${result.channel_count}\n` : ""}\n`;
+        }${result.channel_count ? `Channel Count: ${result.channel_count}\n` : ""}\n` ;
       })
-      .join("\n"); // Join each result with a blank line
-  
+      .join("\n");
+
     const blob = new Blob([textContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -41,7 +45,6 @@ const MacScanner = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,19 +53,16 @@ const MacScanner = () => {
     setSuccessCount(0);
     setFailureCount(0);
 
-    // Ensure baseUrl is provided
     if (!baseUrl) {
       setError("Please enter the IPTV panel URL.");
       return;
     }
 
-    // Validate that the baseUrl starts with http:// or https://
     if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
       setError("Please enter a valid IPTV panel address starting with http:// or https://.");
       return;
     }
 
-    // Ensure a file is selected
     if (!file) {
       setError("Please upload a file containing MAC addresses.");
       return;
@@ -70,17 +70,12 @@ const MacScanner = () => {
 
     setLoading(true);
     setScanInProgress(true);
-    abortControllerRef.current = new AbortController(); // Create a new AbortController for this scan
+    abortControllerRef.current = new AbortController();
 
     try {
-      const macList = await file.text().then((text) =>
-        text
-          .split("\n")
-          .map((line) => line.trim())
-          .filter((line) => line)
-      );
+      const macList = await readFileLines(file); // Read file lines using FileReader
 
-      // Handle each MAC address one by one
+      // Process each MAC address line by line
       for (let i = 0; i < macList.length; i++) {
         if (abortControllerRef.current.signal.aborted) {
           break; // Stop scanning if abort signal is received
@@ -89,12 +84,11 @@ const MacScanner = () => {
         const macAddress = macList[i];
         const payload = { base_url: baseUrl, mac_address: macAddress };
 
-        // Send MAC address to backend for scanning
-        const response = await fetch("https://iptvscanner.onrender.com/macscanner/scan_mac", {
+        const response = await fetch("http://localhost:5000/macscanner/scan_mac", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
-          signal: abortControllerRef.current.signal, // Attach the abort signal
+          signal: abortControllerRef.current.signal,
         });
 
         if (!response.ok) {
@@ -103,29 +97,53 @@ const MacScanner = () => {
         }
 
         const result = await response.json();
-        setResults((prevResults) => [...prevResults, result]);
 
-        // Update success/failure counts dynamically
-        if (result.status === "Success") {
-          setSuccessCount((prevCount) => prevCount + 1);
+        if (result && result.mac && result.status) {
+          setResults((prevResults) => [...prevResults, result]);
+
+          if (result.status === "Success") {
+            setSuccessCount((prevCount) => prevCount + 1);
+          } else {
+            setFailureCount((prevCount) => prevCount + 1);
+          }
         } else {
           setFailureCount((prevCount) => prevCount + 1);
         }
 
         // Optional: Add a small delay between scans for smoother UI interaction
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Adjust the delay as needed
       }
     } catch (err) {
       if (err.name === "AbortError") {
         console.log("Scan stopped by user.");
       } else {
         setError(`An error occurred: ${err.message}`);
-        console.error("Scanning Error: ", err);  // Log error for debugging
+        console.error("Scanning Error: ", err); // Log error for debugging
       }
     } finally {
       setLoading(false);
       setScanInProgress(false);
     }
+  };
+
+  // Helper function to read file and return lines
+  const readFileLines = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = reader.result;
+        const macList = text
+          .split("\n")
+          .map((line) => line.trim()) // Trim each line
+          .filter((line) => line);    // Remove empty lines
+
+        resolve(macList);
+      };
+
+      reader.onerror = (error) => reject(error);
+
+      reader.readAsText(file); // Read the file as text
+    });
   };
 
   return (
