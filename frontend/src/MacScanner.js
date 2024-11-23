@@ -90,7 +90,7 @@ const MacScanner = () => {
         const payload = { base_url: baseUrl, mac_address: macAddress };
 
         // Send MAC address to backend for scanning
-        const response = await fetch("https://iptvscannerbackend.vercel.app/api/macscanner/scan_mac", {
+        const response = await fetch("https://iptvscanner.onrender.com/macscanner/scan_mac", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
