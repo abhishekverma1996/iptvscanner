@@ -14,7 +14,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await axios.post("https://iptvscannerbackend.vercel.app/get_channels", {
+      const response = await axios.post("https://iptvscanner.onrender.com/get_channels", {
         base_url: baseUrl,
         mac: mac,
       });
@@ -33,7 +33,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await axios.post("https://iptvscannerbackend.vercel.app/download_m3u", {
+      const response = await axios.post("https://iptvscanner.onrender.com/download_m3u", {
         base_url: baseUrl,
         mac: mac,
       }, { responseType: 'blob' });
