@@ -8,7 +8,6 @@ import MacToM3U from './MacToM3U'; // New import for MacToM3U
 
 const App = () => {
   const [activeGenerator, setActiveGenerator] = useState('');
-  const [baseUrl, setBaseUrl] = useState(''); // State for the base URL
 
   const showGenerator = (generator) => {
     setActiveGenerator(generator);
@@ -18,21 +17,18 @@ const App = () => {
     setActiveGenerator('');
   };
 
-  const handleBaseUrlChange = (e) => {
-    setBaseUrl(e.target.value); // Update base URL when user types
-  };
 
   return (
-    <div className="App">
+    <div className="App" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <h1>IPTV Tools By LootDailyOffers</h1>
 
       {/* Main page buttons */}
       {activeGenerator === '' && (
         <div>
-          <button onClick={() => showGenerator('MacGenerator')}>MAC Address Generator</button>
-          <button onClick={() => showGenerator('UserPassGenerator')}>User/Pass Combo Generator</button>
+          <button onClick={() => showGenerator('MacGenerator')}>MAC Generator</button>
+          <button onClick={() => showGenerator('UserPassGenerator')}>Combo Generator</button>
           <button onClick={() => showGenerator('MacScanner')}>Mac Scanner</button>
-          <button onClick={() => showGenerator('XStreamGenerator')}>XStream Code Scanner</button>
+          <button onClick={() => showGenerator('XStreamGenerator')}>XStream Scanner</button>
           <button onClick={() => showGenerator('XStreamToM3U')}>XStream to M3U</button>
           <button onClick={() => showGenerator('MacToM3U')}>MAC to M3U</button> {/* New button */}
         </div>
@@ -62,16 +58,7 @@ const App = () => {
 
       {activeGenerator === 'MacScanner' && (
         <div>
-          <div>
-            <h2>Mac Scanner</h2>
-            <input
-              type="text"
-              value={baseUrl}
-              onChange={handleBaseUrlChange}
-              placeholder="Enter IPTV Base URL"
-            />
-          </div>
-          <MacScanner baseUrl={baseUrl} />
+          <MacScanner/>
           <button onClick={hideGenerator}>Back</button>
         </div>
       )}
@@ -89,6 +76,19 @@ const App = () => {
           <button onClick={hideGenerator}>Back</button>
         </div>
       )}
+
+      {/* Footer Note */}
+      <footer style={{
+        textAlign: 'center',
+        padding: '20px',
+        color: '#fff',
+        position: 'bottom',
+        bottom: '0',
+        width: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: Adds a background for visibility
+      }}>
+        <p>Developed by LootDailyOffers, this tool is intended for educational purposes only. We are not liable for any misuse or unintended consequences.</p>
+      </footer>
     </div>
   );
 };
