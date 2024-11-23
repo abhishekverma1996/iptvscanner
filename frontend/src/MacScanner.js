@@ -12,7 +12,10 @@ const MacScanner = () => {
 
   const abortControllerRef = useRef(null);
 
-  const handleBaseUrlChange = (e) => setBaseUrl(e.target.value.trim());
+  const handleBaseUrlChange = (e) => {
+    setBaseUrl(e.target.value); // Allow full typing without interruption
+  };
+
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
     if (uploadedFile) {
@@ -22,7 +25,7 @@ const MacScanner = () => {
 
   const handleStop = () => {
     if (abortControllerRef.current) {
-      abortControllerRef.current.abort(); // Stop the scan process
+      abortControllerRef.current.abort();
       setLoading(false);
       setScanInProgress(false);
     }
@@ -33,7 +36,7 @@ const MacScanner = () => {
       .map((result) => {
         return `Panel URL: ${baseUrl}\nMAC: ${result.mac}\nStatus: ${result.status}\nMessage: ${result.message || ""}\n${
           result.expiry ? `Expiry: ${result.expiry}\n` : ""
-        }${result.channel_count ? `Channel Count: ${result.channel_count}\n` : ""}\n` ;
+        }${result.channel_count ? `Channel Count: ${result.channel_count}\n` : ""}\n`;
       })
       .join("\n");
 
@@ -53,12 +56,13 @@ const MacScanner = () => {
     setSuccessCount(0);
     setFailureCount(0);
 
-    if (!baseUrl) {
+    const trimmedBaseUrl = baseUrl.trim(); // Validate after user finishes typing
+    if (!trimmedBaseUrl) {
       setError("Please enter the IPTV panel URL.");
       return;
     }
 
-    if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
+    if (!trimmedBaseUrl.startsWith("http://") && !trimmedBaseUrl.startsWith("https://")) {
       setError("Please enter a valid IPTV panel address starting with http:// or https://.");
       return;
     }
@@ -73,16 +77,16 @@ const MacScanner = () => {
     abortControllerRef.current = new AbortController();
 
     try {
-      const macList = await readFileLines(file); // Read file lines using FileReader
+      const macList = await readFileLines(file);
 
-      // Process each MAC address line by line
+      // Process MAC addresses one by one
       for (let i = 0; i < macList.length; i++) {
         if (abortControllerRef.current.signal.aborted) {
-          break; // Stop scanning if abort signal is received
+          break;
         }
 
         const macAddress = macList[i];
-        const payload = { base_url: baseUrl, mac_address: macAddress };
+        const payload = { base_url: trimmedBaseUrl, mac_address: macAddress };
 
         const response = await fetch("https://iptvscanner.onrender.com/macscanner/scan_mac", {
           method: "POST",
@@ -97,7 +101,6 @@ const MacScanner = () => {
         }
 
         const result = await response.json();
-
         if (result && result.mac && result.status) {
           setResults((prevResults) => [...prevResults, result]);
 
@@ -110,15 +113,13 @@ const MacScanner = () => {
           setFailureCount((prevCount) => prevCount + 1);
         }
 
-        // Optional: Add a small delay between scans for smoother UI interaction
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Adjust the delay as needed
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
     } catch (err) {
       if (err.name === "AbortError") {
         console.log("Scan stopped by user.");
       } else {
         setError(`An error occurred: ${err.message}`);
-        console.error("Scanning Error: ", err); // Log error for debugging
       }
     } finally {
       setLoading(false);
@@ -126,74 +127,54 @@ const MacScanner = () => {
     }
   };
 
-  // Helper function to read file and return lines
   const readFileLines = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
-        const text = reader.result;
-        const macList = text
+        const lines = reader.result
           .split("\n")
-          .map((line) => line.trim()) // Trim each line
-          .filter((line) => line);    // Remove empty lines
-
-        resolve(macList);
+          .map((line) => line.trim())
+          .filter(Boolean);
+        resolve(lines);
       };
-
-      reader.onerror = (error) => reject(error);
-
-      reader.readAsText(file); // Read the file as text
+      reader.onerror = (err) => reject(err);
+      reader.readAsText(file);
     });
   };
 
   return (
     <div>
       <h1>IPTV MAC Scanner</h1>
-      <h2>Only Supports Normal Portals</h2>
-      {/* Show panel URL input only once */}
-      {!baseUrl && (
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>
-              Panel URL:
-              <input
-                type="text"
-                value={baseUrl}
-                onChange={handleBaseUrlChange}
-                placeholder="Enter IPTV panel address (http:// or https://)"
-                required
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              Upload MAC List File:
-              <input type="file" onChange={handleFileChange} accept=".txt" required />
-            </label>
-          </div>
-          <button type="submit" disabled={loading}>
-            {loading ? "Scanning..." : "Start Scan"}
-          </button>
-        </form>
-      )}
-
-      {/* Show scan results after URL and file are provided */}
-      {baseUrl && (
-        <>
-          <h2>Scanning with URL: {baseUrl}</h2>
-          <form onSubmit={handleSubmit}>
-            <div>
-              <label>
-                Upload MAC List File:
-                <input type="file" onChange={handleFileChange} accept=".txt" required />
-              </label>
-            </div>
-            <button type="submit" disabled={loading}>
-              {loading ? "Scanning..." : "Start Scan"}
-            </button>
-          </form>
-        </>
-      )}
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>
+            Panel URL:
+            <input
+              type="text"
+              value={baseUrl}
+              onChange={handleBaseUrlChange}
+              placeholder="Enter IPTV panel address (http:// or https://)"
+              required
+              autoComplete="off"
+              onFocus={(e) => e.target.setSelectionRange(e.target.value.length, e.target.value.length)} // Ensure caret stays at the end
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Upload MAC List File:
+            <input
+              type="file"
+              onChange={handleFileChange}
+              accept=".txt"
+              required
+            />
+          </label>
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? "Scanning..." : "Start Scan"}
+        </button>
+      </form>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
