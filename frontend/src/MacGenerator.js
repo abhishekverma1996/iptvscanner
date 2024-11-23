@@ -41,6 +41,16 @@ const MacGenerator = () => {
     setIsLoading(false);
   };
 
+  const handleDownload = () => {
+    // Convert results into a plain text string
+    const macText = macs.join('\n'); // Join each MAC address with a new line
+    const blob = new Blob([macText], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'generated_macs.txt';
+    link.click();
+  };
+
   return (
     <div className="container">
       <h2>MAC Generator</h2>
@@ -68,6 +78,12 @@ const MacGenerator = () => {
           ))}
         </div>
       </div>
+
+      {macs.length > 0 && (
+        <button onClick={handleDownload}>
+          Download MACs as Text File
+        </button>
+      )}
     </div>
   );
 };
