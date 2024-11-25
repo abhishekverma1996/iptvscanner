@@ -44,11 +44,11 @@ const XStreamToM3u = () => {
     setLoading(false);
   };
 
-  // Function to open the M3U link in a new tab
+  // Function to open the M3U link in a new tab (without closing it)
   const openM3uLink = () => {
     // Check if the link exists and open it in a new tab
     if (m3uLink && m3uLink !== '') {
-      window.open(m3uLink, '_blank');
+      window.open(m3uLink, '_blank'); // Open the URL in a new tab
     } else {
       console.log('Invalid link or URL');
     }
