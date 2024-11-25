@@ -8,7 +8,6 @@ const XStreamToM3u = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [m3uLink, setM3uLink] = useState('');
 
   // Handle panel address input change
   const handlePanelChange = (e) => {
@@ -25,11 +24,10 @@ const XStreamToM3u = () => {
     setPassword(e.target.value);
   };
 
-  // Function to check and generate the M3U link through the proxy API
-  const checkAndGenerateM3U = async () => {
+  // Function to construct the M3U URL and download it
+  const checkAndDownloadM3U = () => {
     setLoading(true);
     setError('');
-    setM3uLink(''); // Clear previous M3U link
 
     if (!panel || !username || !password) {
       setError('Panel, Username, and Password are required!');
@@ -37,26 +35,18 @@ const XStreamToM3u = () => {
       return;
     }
 
-    try {
-      // Construct the URL for the proxy server that will fetch the M3U link
-      const proxyUrl = `/api/proxy?username=${username}&password=${password}&panel=${panel}&action=get_m3u`;
+    const m3uLink = `/api/proxy?username=${username}&password=${password}&panel=${panel}&action=get_m3u`;
 
-      // Make the API request to get the M3U link
-      const response = await axios.get(proxyUrl, {
-        timeout: 5000, // Timeout after 5 seconds
-      });
+    // Directly download the M3U file if the link is valid
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';  // Hide the iframe
+    iframe.src = m3uLink;
 
-      // Check if the response contains a valid M3U link
-      if (response.data && response.data.m3uLink) {
-        setM3uLink(response.data.m3uLink); // Set the received M3U link
-      } else {
-        setError('Failed to retrieve M3U link.');
-      }
-
-    } catch (error) {
-      console.error('Error generating M3U link:', error);
-      setError('An error occurred while generating the M3U link.');
-    }
+    // Append iframe to body and trigger download
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      document.body.removeChild(iframe); // Remove iframe after the download starts
+    };
 
     setLoading(false);
   };
@@ -96,20 +86,12 @@ const XStreamToM3u = () => {
       </div>
 
       {/* Check and Generate Button */}
-      <button onClick={checkAndGenerateM3U} disabled={loading}>
+      <button onClick={checkAndDownloadM3U} disabled={loading}>
         {loading ? 'Checking...' : 'Check and Generate M3U'}
       </button>
 
       {/* Error message */}
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
-
-      {/* Display the M3U link once generated */}
-      {m3uLink && (
-        <div style={{ marginTop: '20px' }}>
-          <h4>Generated M3U Link:</h4>
-          <a href={m3uLink} target="_blank" rel="noopener noreferrer">Download M3U</a>
-        </div>
-      )}
     </div>
   );
 };
