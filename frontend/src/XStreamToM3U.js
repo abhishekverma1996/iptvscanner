@@ -24,8 +24,14 @@ const XStreamToM3u = () => {
     setPassword(e.target.value);
   };
 
+  // Function to extract the panel name from the URL
+  const extractPanelName = (url) => {
+    const hostname = new URL(url).hostname; // Extract hostname
+    return hostname.replace(/[^a-zA-Z0-9]/g, '_'); // Replace any non-alphanumeric characters with underscores
+  };
+
   // Function to construct the M3U URL and download it
-  const checkAndDownloadM3U = () => {
+  const checkAndDownloadM3U = async () => {
     setLoading(true);
     setError('');
 
@@ -37,18 +43,29 @@ const XStreamToM3u = () => {
 
     const m3uLink = `/api/proxy?username=${username}&password=${password}&panel=${panel}&action=get_m3u`;
 
-    // Directly download the M3U file if the link is valid
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';  // Hide the iframe
-    iframe.src = m3uLink;
+    try {
+      // Request to get the M3U content from the backend
+      const response = await axios.get(m3uLink, { responseType: 'blob' });
 
-    // Append iframe to body and trigger download
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      document.body.removeChild(iframe); // Remove iframe after the download starts
-    };
+      // Extract the panel name from the URL to use it as the filename
+      const panelName = extractPanelName(panel);
+      const fileName = `${panelName}.m3u`;
 
-    setLoading(false);
+      // Create a URL for the file to download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName); // Set the dynamic file name based on panel name
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up and reset
+      document.body.removeChild(link);
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to generate M3U. Please check the details and try again.');
+      setLoading(false);
+    }
   };
 
   return (
