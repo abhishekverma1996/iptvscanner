@@ -72,7 +72,7 @@ def generate_m3u(base_url: str, channels_data: List[Dict[str, Any]], group_info:
         group_name = group_info.get(group_id, "General")
         name = channel['name']
         logo = channel.get('logo', '')
-        cmd_url = channel['cmds'][0]['url'].replace('ffmpeg ', '...')
+        cmd_url = channel['cmds'][0]['url'].replace('ffmpeg ', '')
         if "localhost" in cmd_url:
             ch_id_match = re.search(r'/ch/(\d+)_', cmd_url)
             if ch_id_match:
