@@ -7,7 +7,7 @@ const XStreamToM3u = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [generatedLink, setGeneratedLink] = useState(''); // State to store the generated link
+  const [downloadLink, setDownloadLink] = useState(''); // State to store the generated download link
 
   // Handle panel address input change
   const handlePanelChange = (e) => {
@@ -24,8 +24,8 @@ const XStreamToM3u = () => {
     setPassword(e.target.value);
   };
 
-  // Function to generate M3U link
-  const checkAndGenerateM3ULink = () => {
+  // Function to generate M3U link (direct download URL)
+  const checkAndGenerateDownloadLink = () => {
     setLoading(true);
     setError('');
 
@@ -35,11 +35,11 @@ const XStreamToM3u = () => {
       return;
     }
 
-    // Construct the M3U URL
-    const m3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
+    // Construct the M3U download URL
+    const m3uDownloadLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
 
-    // Set the generated link state
-    setGeneratedLink(m3uLink);
+    // Set the generated download link state
+    setDownloadLink(m3uDownloadLink);
 
     setLoading(false);
   };
@@ -79,18 +79,20 @@ const XStreamToM3u = () => {
       </div>
 
       {/* Check and Generate Button */}
-      <button onClick={checkAndGenerateM3ULink} disabled={loading}>
+      <button onClick={checkAndGenerateDownloadLink} disabled={loading}>
         {loading ? 'Generating Link...' : 'Generate M3U Link'}
       </button>
 
       {/* Error message */}
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
 
-      {/* Display the generated M3U link below the button */}
-      {generatedLink && (
+      {/* Display the generated download link below the button */}
+      {downloadLink && (
         <div style={{ marginTop: '20px' }}>
-          <p>Generated M3U Link:</p>
-          <p>{generatedLink}</p>
+          <p>Click below to download the M3U file:</p>
+          <a href={downloadLink} download>
+            Download M3U File
+          </a>
         </div>
       )}
     </div>
