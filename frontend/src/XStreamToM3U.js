@@ -7,6 +7,7 @@ const XStreamToM3u = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [generatedLink, setGeneratedLink] = useState('');
 
   // Handle panel address input change
   const handlePanelChange = (e) => {
@@ -23,10 +24,11 @@ const XStreamToM3u = () => {
     setPassword(e.target.value);
   };
 
-  // Function to construct the M3U URL and open it in a new tab
-  const checkAndOpenM3U = () => {
+  // Function to construct the M3U URL and provide it as a link
+  const checkAndGenerateM3ULink = () => {
     setLoading(true);
     setError('');
+    setGeneratedLink('');
 
     if (!panel || !username || !password) {
       setError('Panel, Username, and Password are required!');
@@ -37,8 +39,8 @@ const XStreamToM3u = () => {
     // Construct the M3U URL
     const m3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
 
-    // Open the M3U link in a new tab
-    window.open(m3uLink, '_blank');
+    // Set the generated M3U link
+    setGeneratedLink(m3uLink);
 
     setLoading(false);
   };
@@ -78,12 +80,22 @@ const XStreamToM3u = () => {
       </div>
 
       {/* Check and Generate Button */}
-      <button onClick={checkAndOpenM3U} disabled={loading}>
-        {loading ? 'Checking...' : 'Check and Open M3U'}
+      <button onClick={checkAndGenerateM3ULink} disabled={loading}>
+        {loading ? 'Checking...' : 'Generate M3U Link'}
       </button>
 
       {/* Error message */}
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+
+      {/* Display the generated link */}
+      {generatedLink && (
+        <div style={{ marginTop: '10px' }}>
+          <p>Click the link below to open the M3U file in a new tab:</p>
+          <a href={generatedLink} target="_blank" rel="noopener noreferrer">
+            Open M3U in a new tab
+          </a>
+        </div>
+      )}
     </div>
   );
 };
