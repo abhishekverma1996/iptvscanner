@@ -72,8 +72,9 @@ const XStreamGenerator = () => {
           const [username, password] = line.split(':').map((str) => str.trim());
 
           // Use the proxy API route for M3U request
-          const m3uUrl = `/api/proxy?username=${username}&password=${password}&panel=${panel}`;
+          const m3uUrl = `/api/proxy?username=${username}&password=${password}&panel=${panel}&action=get_m3u`;
           const categoryUrl = `/api/proxy?username=${username}&password=${password}&panel=${panel}&action=get_live_categories`;
+
 
           // Immediately show that the combo is being scanned
           setScanProgress((prevProgress) => {
