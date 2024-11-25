@@ -4,6 +4,7 @@ exports.handler = async (event, context) => {
   const { username, password, panel, action } = event.queryStringParameters;
 
   if (!username || !password || !panel || !action) {
+    console.error('Missing parameters:', { username, password, panel, action });
     return {
       statusCode: 400,
       body: JSON.stringify({ error: 'Missing required parameters.' }),
@@ -11,37 +12,33 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Construct the URL based on the action
     let url = '';
     if (action === 'get_m3u') {
-      // For XStreamToM3u, get the M3U link
       url = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
     } else if (action === 'get_categories') {
-      // If action is to get live categories
       url = `${panel}/player_api.php?username=${username}&password=${password}&action=get_live_categories`;
     } else {
+      console.error('Invalid action:', action);
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Invalid action.' }),
       };
     }
 
-    // Make the request to the panel's URL
-    const response = await axios.get(url, {
-      timeout: 5000, // Timeout after 5 seconds
-    });
+    // Log the final URL being requested
+    console.log('Requesting URL:', url);
 
-    // Return the response data back to the client
+    const response = await axios.get(url, { timeout: 5000 });
+
+    // Log the response
+    console.log('Response from panel:', response.data);
+
     if (action === 'get_m3u') {
-      // For M3U action, return the m3u link
       return {
         statusCode: 200,
-        body: JSON.stringify({
-          m3uLink: response.data, // M3U content returned from the panel
-        }),
+        body: JSON.stringify({ m3uLink: response.data }),
       };
     } else if (action === 'get_categories') {
-      // If categories are fetched, return them
       return {
         statusCode: 200,
         body: JSON.stringify(response.data),
@@ -50,9 +47,28 @@ exports.handler = async (event, context) => {
   } catch (error) {
     console.error('Error making request to panel:', error);
 
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to fetch data from panel.' }),
-    };
+    // Check if the error is a network error or response error
+    if (error.response) {
+      // Response error (non-2xx status code)
+      console.error('Response error:', error.response.data);
+      return {
+        statusCode: error.response.status || 500,
+        body: JSON.stringify({ error: error.response.data || 'Failed to fetch data from panel.' }),
+      };
+    } else if (error.request) {
+      // Network error (request made, but no response)
+      console.error('Network error:', error.request);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Network error. Unable to reach the panel.' }),
+      };
+    } else {
+      // Unknown error
+      console.error('Unexpected error:', error.message);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Unexpected error occurred.' }),
+      };
+    }
   }
 };
