@@ -35,13 +35,8 @@ const XStreamToM3u = () => {
       return;
     }
 
-    // Encode the dynamic parts of the URL to avoid special character issues
-    const encodedUsername = encodeURIComponent(username);
-    const encodedPassword = encodeURIComponent(password);
-    const encodedPanel = encodeURIComponent(panel);
-
     // Construct the M3U URL based on user inputs
-    const generatedM3uLink = `${encodedPanel}/get.php?username=${encodedUsername}&password=${encodedPassword}&type=m3u`;
+    const generatedM3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
 
     // Set the generated M3U URL in the state
     setM3uLink(generatedM3uLink);
@@ -91,12 +86,14 @@ const XStreamToM3u = () => {
       {/* Error message */}
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
 
-      {/* Display the generated M3U URL as text */}
+      {/* Display the generated M3U URL as a clickable link */}
       {m3uLink && (
         <div style={{ marginTop: '20px' }}>
           <p>Generated M3U URL:</p>
-          {/* Display the M3U URL as plain text */}
-          <pre>{m3uLink}</pre>
+          {/* Display the URL as a clickable link */}
+          <a href={m3uLink} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
+            {m3uLink}
+          </a>
         </div>
       )}
     </div>
