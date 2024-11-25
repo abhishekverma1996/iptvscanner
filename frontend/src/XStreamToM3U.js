@@ -34,17 +34,48 @@ const XStreamToM3u = () => {
       return;
     }
 
-    const m3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
+    // Check if panel URL starts with "http://"
+    let m3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
 
-    // Directly download the M3U file if the link is valid
+    // If the panel is using http://, try to change it to https://
+    if (panel.startsWith("http://")) {
+      const httpsPanel = panel.replace("http://", "https://");
+      
+      // Test if the https:// version works
+      fetch(httpsPanel)  // Try making a request to the HTTPS version
+        .then((response) => {
+          if (response.ok) {
+            // If HTTPS works, use that URL
+            m3uLink = `${httpsPanel}/get.php?username=${username}&password=${password}&type=m3u`;
+          } else {
+            // If HTTPS fails, fallback to HTTP (no need to do anything as m3uLink is already set)
+            console.log("HTTPS request failed, using HTTP instead.");
+          }
+        })
+        .catch((err) => {
+          // Handle error if HTTPS fails (i.e., no response)
+          console.log("HTTPS request failed, using HTTP instead.", err);
+        })
+        .finally(() => {
+          // After attempting to update m3uLink, trigger the iframe download
+          triggerIframeDownload(m3uLink);
+        });
+    } else {
+      // If the panel already uses https://, proceed directly
+      triggerIframeDownload(m3uLink);
+    }
+  };
+
+  // Function to trigger iframe download
+  const triggerIframeDownload = (m3uLink) => {
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';  // Hide the iframe
     iframe.src = m3uLink;
 
-    // Append iframe to body and trigger download
+    // Append iframe to body to start the download
     document.body.appendChild(iframe);
     iframe.onload = () => {
-      document.body.removeChild(iframe); // Remove iframe after the download starts
+      document.body.removeChild(iframe); // Remove iframe after download starts
     };
 
     setLoading(false);
