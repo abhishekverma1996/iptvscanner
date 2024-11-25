@@ -89,9 +89,10 @@ const XStreamToM3u = () => {
       {/* Display the generated download link below the button */}
       {downloadLink && (
         <div style={{ marginTop: '20px' }}>
-          <p>Click below to download the M3U file:</p>
-          <a href={downloadLink} download>
-            Download M3U File
+          <p>Click below to open the M3U link in a new tab:</p>
+          {/* Use target="_blank" to open the URL in a new tab */}
+          <a href={downloadLink} target="_blank" rel="noopener noreferrer">
+            Open M3U File in New Tab
           </a>
         </div>
       )}
