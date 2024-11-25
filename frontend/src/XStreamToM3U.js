@@ -7,7 +7,7 @@ const XStreamToM3u = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [generatedLink, setGeneratedLink] = useState(''); // State for generated link
+  const [generatedLink, setGeneratedLink] = useState(''); // State to store the generated link
 
   // Handle panel address input change
   const handlePanelChange = (e) => {
@@ -86,13 +86,11 @@ const XStreamToM3u = () => {
       {/* Error message */}
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
 
-      {/* Display the generated M3U link as a clickable anchor tag */}
+      {/* Display the generated M3U link below the button */}
       {generatedLink && (
         <div style={{ marginTop: '20px' }}>
-          <p>Click below to open the M3U file in a new tab:</p>
-          <a href={generatedLink} target="_blank" rel="noopener noreferrer">
-            Open M3U Link
-          </a>
+          <p>Generated M3U Link:</p>
+          <p>{generatedLink}</p>
         </div>
       )}
     </div>
