@@ -7,7 +7,7 @@ const XStreamToM3u = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [downloadLink, setDownloadLink] = useState(''); // State to store the generated download link
+  const [m3uLink, setM3uLink] = useState(''); // Store the generated M3U link
 
   // Handle panel address input change
   const handlePanelChange = (e) => {
@@ -24,7 +24,7 @@ const XStreamToM3u = () => {
     setPassword(e.target.value);
   };
 
-  // Function to generate M3U link (direct download URL)
+  // Function to generate the M3U link (direct URL for downloading)
   const checkAndGenerateDownloadLink = () => {
     setLoading(true);
     setError('');
@@ -35,11 +35,11 @@ const XStreamToM3u = () => {
       return;
     }
 
-    // Construct the M3U download URL
-    const m3uDownloadLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
+    // Construct the M3U URL based on user inputs
+    const generatedM3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
 
-    // Set the generated download link state
-    setDownloadLink(m3uDownloadLink);
+    // Set the generated M3U URL in the state
+    setM3uLink(generatedM3uLink);
 
     setLoading(false);
   };
@@ -86,13 +86,13 @@ const XStreamToM3u = () => {
       {/* Error message */}
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
 
-      {/* Display the generated download link below the button */}
-      {downloadLink && (
+      {/* Display the generated M3U URL as a clickable link */}
+      {m3uLink && (
         <div style={{ marginTop: '20px' }}>
-          <p>Click below to open the M3U link in a new tab:</p>
-          {/* Use target="_blank" to open the URL in a new tab */}
-          <a href={downloadLink} target="_blank" rel="noopener noreferrer">
-            Open M3U File in New Tab
+          <p>Click below to open the M3U file:</p>
+          {/* Open the generated M3U link in a new tab */}
+          <a href={m3uLink} target="_blank" rel="noopener noreferrer">
+            Open M3U File
           </a>
         </div>
       )}
