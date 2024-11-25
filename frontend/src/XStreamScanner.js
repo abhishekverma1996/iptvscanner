@@ -71,8 +71,9 @@ const XStreamGenerator = () => {
         if (match) {
           const [username, password] = line.split(':').map((str) => str.trim());
 
-          const link = `${panel}/player_api.php?username=${username}&password=${password}&type=m3u`;
-          const categoryUrl = `${panel}/player_api.php?username=${username}&password=${password}&action=get_live_categories`;
+          // Use the proxy API route for M3U request
+          const m3uUrl = `/api/proxy?username=${username}&password=${password}&panel=${panel}`;
+          const categoryUrl = `/api/proxy?username=${username}&password=${password}&panel=${panel}&action=get_live_categories`;
 
           // Immediately show that the combo is being scanned
           setScanProgress((prevProgress) => {
@@ -87,15 +88,15 @@ const XStreamGenerator = () => {
           });
 
           try {
-            // Make the request with the user-specified protocol
-            const response = await axios.get(link, {
+            // Make the request with the proxy API for M3U link
+            const response = await axios.get(m3uUrl, {
               timeout: 5000, // Timeout after 5 seconds
               maxRedirects: 5, // Allow following up to 5 redirects
               signal: abortControllerRef.current.signal, // Connect to abort controller
             });
 
-            if (response.data && response.data.user_info && response.data.user_info.username) {
-              // Fetch category info if the checkbox is checked
+            if (response.data) {
+              // Fetch category info if the checkbox is checked using proxy API
               let categories = '';
               if (includeCategories) {
                 try {
