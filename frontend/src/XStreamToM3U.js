@@ -7,7 +7,7 @@ const XStreamToM3u = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [generatedLink, setGeneratedLink] = useState(''); // New state to store the generated link
+  const [generatedLink, setGeneratedLink] = useState(''); // State for generated link
 
   // Handle panel address input change
   const handlePanelChange = (e) => {
@@ -38,7 +38,7 @@ const XStreamToM3u = () => {
     // Construct the M3U URL
     const m3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
 
-    // Set the generated link state so it can be displayed
+    // Set the generated link state
     setGeneratedLink(m3uLink);
 
     setLoading(false);
