@@ -48,12 +48,7 @@ const XStreamToM3u = () => {
   const openM3uLink = () => {
     // Check if the link exists and open it in a new tab
     if (m3uLink && m3uLink !== '') {
-      const newWindow = window.open(m3uLink, '_blank');
-      if (newWindow) {
-        newWindow.focus(); // Ensures that the new tab receives focus
-      } else {
-        console.log('Popup blocked or link issue');
-      }
+      window.open(m3uLink, '_blank');
     } else {
       console.log('Invalid link or URL');
     }
@@ -105,8 +100,10 @@ const XStreamToM3u = () => {
       {m3uLink && (
         <div style={{ marginTop: '20px' }}>
           <p>Generated M3U URL:</p>
+          
           {/* Button to open the M3U link in a new tab */}
           <button onClick={openM3uLink}>Open M3U File in New Tab</button>
+
           <div style={{ marginTop: '10px' }}>
             <p>Or manually open the following link:</p>
             <a href={m3uLink} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
