@@ -26,8 +26,16 @@ module.exports = async (req, res) => {
       // Make the request to the panel
       const response = await axios.get(m3uUrl, { timeout: 5000 });
 
-      // Return the M3U link data
-      return res.status(200).json({ m3uLink: response.data });
+      // Check if M3U data is returned and clean it
+      if (response.data) {
+        // Clean the M3U response to ensure proper line breaks
+        const cleanedM3U = response.data.replace(/\r\n/g, '\n');  // Remove any \r and ensure \n only
+
+        // Return the cleaned M3U link data
+        return res.status(200).json({ m3uLink: cleanedM3U });
+      } else {
+        return res.status(500).json({ error: 'M3U data not returned from panel.' });
+      }
     } else if (action === 'get_live_categories') {
       // For getting live categories
       const categoryUrl = `${url}&action=get_live_categories`;
