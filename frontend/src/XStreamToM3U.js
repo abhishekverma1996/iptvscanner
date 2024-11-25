@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './XStreamToM3u.css';
+import axios from 'axios';
 
 const XStreamToM3u = () => {
   const [panel, setPanel] = useState('');
@@ -7,7 +8,7 @@ const XStreamToM3u = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [m3uLink, setM3uLink] = useState(''); // State to store the generated M3U link
+  const [m3uLink, setM3uLink] = useState('');
 
   // Handle panel address input change
   const handlePanelChange = (e) => {
@@ -24,10 +25,11 @@ const XStreamToM3u = () => {
     setPassword(e.target.value);
   };
 
-  // Function to generate the M3U link (direct URL for downloading)
-  const checkAndGenerateDownloadLink = () => {
+  // Function to check and generate the M3U link through the proxy API
+  const checkAndGenerateM3U = async () => {
     setLoading(true);
     setError('');
+    setM3uLink(''); // Clear previous M3U link
 
     if (!panel || !username || !password) {
       setError('Panel, Username, and Password are required!');
@@ -35,23 +37,28 @@ const XStreamToM3u = () => {
       return;
     }
 
-    // Construct the M3U URL based on user inputs
-    const generatedM3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
+    try {
+      // Construct the URL for the proxy server that will fetch the M3U link
+      const proxyUrl = `/api/proxy?username=${username}&password=${password}&panel=${panel}&action=get_m3u`;
 
-    // Set the generated M3U URL in the state
-    setM3uLink(generatedM3uLink);
+      // Make the API request to get the M3U link
+      const response = await axios.get(proxyUrl, {
+        timeout: 5000, // Timeout after 5 seconds
+      });
+
+      // Check if the response contains a valid M3U link
+      if (response.data && response.data.m3uLink) {
+        setM3uLink(response.data.m3uLink); // Set the received M3U link
+      } else {
+        setError('Failed to retrieve M3U link.');
+      }
+
+    } catch (error) {
+      console.error('Error generating M3U link:', error);
+      setError('An error occurred while generating the M3U link.');
+    }
 
     setLoading(false);
-  };
-
-  // Function to open the M3U link in a new tab (without closing it)
-  const openM3uLink = () => {
-    // Check if the link exists and open it in a new tab
-    if (m3uLink && m3uLink !== '') {
-      window.open(m3uLink, '_blank'); // Open the URL in a new tab
-    } else {
-      console.log('Invalid link or URL');
-    }
   };
 
   return (
@@ -89,27 +96,18 @@ const XStreamToM3u = () => {
       </div>
 
       {/* Check and Generate Button */}
-      <button onClick={checkAndGenerateDownloadLink} disabled={loading}>
-        {loading ? 'Generating Link...' : 'Generate M3U Link'}
+      <button onClick={checkAndGenerateM3U} disabled={loading}>
+        {loading ? 'Checking...' : 'Check and Generate M3U'}
       </button>
 
       {/* Error message */}
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
 
-      {/* Display the generated M3U URL as a clickable link */}
+      {/* Display the M3U link once generated */}
       {m3uLink && (
         <div style={{ marginTop: '20px' }}>
-          <p>Generated M3U URL:</p>
-          
-          {/* Button to open the M3U link in a new tab */}
-          <button onClick={openM3uLink}>Open M3U File in New Tab</button>
-
-          <div style={{ marginTop: '10px' }}>
-            <p>Or manually open the following link:</p>
-            <a href={m3uLink} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
-              {m3uLink}
-            </a>
-          </div>
+          <h4>Generated M3U Link:</h4>
+          <a href={m3uLink} target="_blank" rel="noopener noreferrer">Download M3U</a>
         </div>
       )}
     </div>
