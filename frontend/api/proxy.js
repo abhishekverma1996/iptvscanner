@@ -28,8 +28,10 @@ module.exports = async (req, res) => {
 
       // Check if M3U data is returned and clean it
       if (response.data) {
-        // Clean the M3U response to ensure proper line breaks
-        const cleanedM3U = response.data.replace(/\r\n/g, '\n');  // Remove any \r and ensure \n only
+        // Clean the M3U response to ensure proper format
+        let cleanedM3U = response.data.replace(/\r\n/g, '\n'); // Remove any \r and ensure \n only
+        cleanedM3U = cleanedM3U.replace(/^#EXTM3U\n/, ''); // Remove any extra #EXTM3U newline at the start
+        cleanedM3U = '#EXTM3U\n' + cleanedM3U.trim(); // Ensure #EXTM3U is at the beginning without extra newlines
 
         // Return the cleaned M3U link data
         return res.status(200).json({ m3uLink: cleanedM3U });
