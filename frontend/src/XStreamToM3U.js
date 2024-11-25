@@ -23,8 +23,8 @@ const XStreamToM3u = () => {
     setPassword(e.target.value);
   };
 
-  // Function to construct the M3U URL and download it
-  const checkAndDownloadM3U = () => {
+  // Function to construct the M3U URL and open it in a new tab
+  const checkAndOpenM3U = () => {
     setLoading(true);
     setError('');
 
@@ -34,49 +34,11 @@ const XStreamToM3u = () => {
       return;
     }
 
-    // Check if panel URL starts with "http://"
-    let m3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
+    // Construct the M3U URL
+    const m3uLink = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
 
-    // If the panel is using http://, try to change it to https://
-    if (panel.startsWith("http://")) {
-      const httpsPanel = panel.replace("http://", "https://");
-      
-      // Test if the https:// version works
-      fetch(httpsPanel)  // Try making a request to the HTTPS version
-        .then((response) => {
-          if (response.ok) {
-            // If HTTPS works, use that URL
-            m3uLink = `${httpsPanel}/get.php?username=${username}&password=${password}&type=m3u`;
-          } else {
-            // If HTTPS fails, fallback to HTTP (no need to do anything as m3uLink is already set)
-            console.log("HTTPS request failed, using HTTP instead.");
-          }
-        })
-        .catch((err) => {
-          // Handle error if HTTPS fails (i.e., no response)
-          console.log("HTTPS request failed, using HTTP instead.", err);
-        })
-        .finally(() => {
-          // After attempting to update m3uLink, trigger the iframe download
-          triggerIframeDownload(m3uLink);
-        });
-    } else {
-      // If the panel already uses https://, proceed directly
-      triggerIframeDownload(m3uLink);
-    }
-  };
-
-  // Function to trigger iframe download
-  const triggerIframeDownload = (m3uLink) => {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';  // Hide the iframe
-    iframe.src = m3uLink;
-
-    // Append iframe to body to start the download
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      document.body.removeChild(iframe); // Remove iframe after download starts
-    };
+    // Open the M3U link in a new tab
+    window.open(m3uLink, '_blank');
 
     setLoading(false);
   };
@@ -116,8 +78,8 @@ const XStreamToM3u = () => {
       </div>
 
       {/* Check and Generate Button */}
-      <button onClick={checkAndDownloadM3U} disabled={loading}>
-        {loading ? 'Checking...' : 'Check and Generate M3U'}
+      <button onClick={checkAndOpenM3U} disabled={loading}>
+        {loading ? 'Checking...' : 'Check and Open M3U'}
       </button>
 
       {/* Error message */}
