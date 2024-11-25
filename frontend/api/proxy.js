@@ -1,49 +1,30 @@
 const axios = require('axios');
 
-exports.handler = async (event, context) => {
-  const { username, password, panel, action } = event.queryStringParameters;
+// Define the handler function
+module.exports = async (req, res) => {
+  const { username, password, panel } = req.query; // Access query parameters
 
-  if (!username || !password || !panel || !action) {
-    console.error('Missing parameters:', { username, password, panel, action });
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Missing required parameters.' }),
-    };
+  // Check if parameters are missing
+  if (!username || !password || !panel) {
+    console.error('Missing parameters:', { username, password, panel });
+    return res.status(400).json({ error: 'Missing required parameters.' });
   }
 
   try {
-    let url = '';
-    if (action === 'get_m3u') {
-      url = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
-    } else if (action === 'get_categories') {
-      url = `${panel}/player_api.php?username=${username}&password=${password}&action=get_live_categories`;
-    } else {
-      console.error('Invalid action:', action);
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid action.' }),
-      };
-    }
+    // Construct the URL to request data from the panel
+    const url = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
 
-    // Log the final URL being requested
+    // Log the full URL to confirm it's being built correctly
     console.log('Requesting URL:', url);
 
+    // Make the request to the panel
     const response = await axios.get(url, { timeout: 5000 });
 
     // Log the response
     console.log('Response from panel:', response.data);
 
-    if (action === 'get_m3u') {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ m3uLink: response.data }),
-      };
-    } else if (action === 'get_categories') {
-      return {
-        statusCode: 200,
-        body: JSON.stringify(response.data),
-      };
-    }
+    // Return the response data as needed
+    return res.status(200).json({ m3uLink: response.data });
   } catch (error) {
     console.error('Error making request to panel:', error);
 
@@ -51,24 +32,15 @@ exports.handler = async (event, context) => {
     if (error.response) {
       // Response error (non-2xx status code)
       console.error('Response error:', error.response.data);
-      return {
-        statusCode: error.response.status || 500,
-        body: JSON.stringify({ error: error.response.data || 'Failed to fetch data from panel.' }),
-      };
+      return res.status(error.response.status || 500).json({ error: error.response.data || 'Failed to fetch data from panel.' });
     } else if (error.request) {
       // Network error (request made, but no response)
       console.error('Network error:', error.request);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Network error. Unable to reach the panel.' }),
-      };
+      return res.status(500).json({ error: 'Network error. Unable to reach the panel.' });
     } else {
       // Unknown error
       console.error('Unexpected error:', error.message);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Unexpected error occurred.' }),
-      };
+      return res.status(500).json({ error: 'Unexpected error occurred.' });
     }
   }
 };
