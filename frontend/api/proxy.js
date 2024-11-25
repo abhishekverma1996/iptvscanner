@@ -1,54 +1,57 @@
 const axios = require('axios');
 
-// Define the handler function
 module.exports = async (req, res) => {
   const { username, password, panel, action } = req.query; // Access query parameters
 
-  // Check if parameters are missing
-  if (!username || !password || !panel || !action) {
+  // Log the received parameters for debugging
+  console.log('Received parameters:', { username, password, panel, action });
+
+  // Check if required parameters are missing
+  if (!username || !password || !panel) {
     console.error('Missing parameters:', { username, password, panel, action });
     return res.status(400).json({ error: 'Missing required parameters.' });
   }
 
   try {
     // Construct the URL to request data from the panel
-    const url = `${panel}/get.php?username=${username}&password=${password}&type=m3u`;
+    const url = `${panel}/get.php?username=${username}&password=${password}`;
 
-    // Log the full URL to confirm it's being built correctly
-    console.log('Requesting URL:', url);
-
-    // Make the request to the panel
-    const response = await axios.get(url, { timeout: 5000 });
-
-    // Log the response
-    console.log('Response from panel:', response.data);
-
-    // Check the action to decide how to respond
     if (action === 'get_m3u') {
-      // Set headers for file download (forcing the browser to download the file)
-      res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');  // Set the content type as m3u
-      res.setHeader('Content-Disposition', 'attachment; filename=panelname.m3u');  // Provide the file name
+      // For M3U generation
+      const m3uUrl = `${url}&type=m3u`;
 
-      // Send the raw M3U data as the file content
-      return res.send(response.data);
+      // Log the URL for M3U request
+      console.log('Requesting M3U URL:', m3uUrl);
+
+      // Make the request to the panel
+      const response = await axios.get(m3uUrl, { timeout: 5000 });
+
+      // Return the M3U link data
+      return res.status(200).json({ m3uLink: response.data });
+    } else if (action === 'get_live_categories') {
+      // For getting live categories
+      const categoryUrl = `${url}&action=get_live_categories`;
+
+      // Log the URL for category request
+      console.log('Requesting Category URL:', categoryUrl);
+
+      // Make the request to fetch categories
+      const response = await axios.get(categoryUrl, { timeout: 5000 });
+
+      // Return category data
+      return res.status(200).json(response.data);
     } else {
-      return res.status(400).json({ error: 'Unknown action.' });
+      return res.status(400).json({ error: 'Invalid action.' });
     }
   } catch (error) {
-    console.error('Error making request to panel:', error);
+    console.error('Error:', error);
 
-    // Check if the error is a network error or response error
+    // Check for response or network errors
     if (error.response) {
-      // Response error (non-2xx status code)
-      console.error('Response error:', error.response.data);
       return res.status(error.response.status || 500).json({ error: error.response.data || 'Failed to fetch data from panel.' });
     } else if (error.request) {
-      // Network error (request made, but no response)
-      console.error('Network error:', error.request);
       return res.status(500).json({ error: 'Network error. Unable to reach the panel.' });
     } else {
-      // Unknown error
-      console.error('Unexpected error:', error.message);
       return res.status(500).json({ error: 'Unexpected error occurred.' });
     }
   }
