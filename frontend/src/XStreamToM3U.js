@@ -44,6 +44,14 @@ const XStreamToM3u = () => {
     setLoading(false);
   };
 
+  // Function to open the M3U link in a new tab
+  const openM3uLink = () => {
+    // Check if the link exists and open it in a new tab
+    if (m3uLink) {
+      window.open(m3uLink, '_blank'); // Open the M3U link in a new tab
+    }
+  };
+
   return (
     <div className="generator">
       <h2>XStream to M3U Generator</h2>
@@ -91,9 +99,13 @@ const XStreamToM3u = () => {
         <div style={{ marginTop: '20px' }}>
           <p>Generated M3U URL:</p>
           {/* Display the URL as a clickable link */}
-          <a href={m3uLink} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
-            {m3uLink}
-          </a>
+          <button onClick={openM3uLink}>Open M3U File in New Tab</button>
+          <div style={{ marginTop: '10px' }}>
+            <p>Or manually open the following link:</p>
+            <a href={m3uLink} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
+              {m3uLink}
+            </a>
+          </div>
         </div>
       )}
     </div>
